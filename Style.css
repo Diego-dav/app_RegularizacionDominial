@@ -1,0 +1,137 @@
+/* style.css
+   CSS externo para "App-regularizacion-lanus" (mockup original)
+   Paleta: blanco + Azul Francia (#0B4DA2)
+   Diseño: dashboard, responsive, efectos hover, checklist con tarjetas grandes
+*/
+
+:root{
+  --azul-francia:#0B4DA2;
+  --blanco:#ffffff;
+  --gris-100:#f5f8ff;
+  --gris-300:#e6eefb;
+  --gris-500:#9aa7c7;
+  --texto:#222831;
+  --exito:#28a745;
+  --error:#d9534f;
+  --radio:14px;
+  --gap:18px;
+  --card-min:180px;
+  --transition:250ms cubic-bezier(.2,.9,.2,1);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;}
+body{
+  margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:var(--texto);background:linear-gradient(180deg,var(--blanco),var(--gris-100));-webkit-font-smoothing:antialiased;
+}
+
+/* --------- HEADER --------- */
+header{
+  background:var(--azul-francia);
+  color:var(--blanco);
+  padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:60;box-shadow:0 6px 18px rgba(11,77,162,0.12);
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .emblem{width:48px;height:48px;border-radius:10px;background:var(--blanco);color:var(--azul-francia);display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 8px 24px rgba(11,77,162,0.08)}
+header h1{font-size:16px;margin:0;font-weight:700}
+.controls{margin-left:auto;display:flex;align-items:center;gap:10px}
+.search{background:rgba(255,255,255,0.08);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;align-items:center}
+.search input{background:transparent;border:0;color:#fff;outline:none;min-width:160px}
+
+/* --------- LAYOUT (SIDEBAR + CONTENT) --------- */
+.app-wrap{display:flex;align-items:stretch;min-height:calc(100vh - 72px);padding:20px;gap:20px}
+
+/* side nav */
+.sidenav{width:220px;background:var(--blanco);border-radius:12px;padding:14px;box-shadow:0 12px 30px rgba(11,77,162,0.06);display:flex;flex-direction:column;gap:8px}
+.sidenav .nav-item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;color:var(--azul-francia);font-weight:600;cursor:pointer;transition:var(--transition)}
+.sidenav .nav-item:hover{background:linear-gradient(90deg, rgba(11,77,162,0.04), rgba(11,77,162,0.02));transform:translateY(-3px)}
+.sidenav .nav-item.active{background:var(--azul-francia);color:var(--blanco);box-shadow:0 10px 30px rgba(11,77,162,0.09)}
+
+/* main content */
+.content{flex:1;display:flex;flex-direction:column;gap:16px}
+.top-actions{display:flex;gap:12px;align-items:center}
+.chip{background:var(--blanco);padding:8px 12px;border-radius:999px;font-weight:700;box-shadow:0 8px 24px rgba(11,77,162,0.06)}
+
+/* grid de tarjetas */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--gap)}
+
+.card{
+  background:linear-gradient(180deg,#ffffff,#fbfdff);
+  border-radius:var(--radio);
+  padding:14px;display:flex;flex-direction:column;gap:10px;min-height:var(--card-min);position:relative;box-shadow:0 8px 24px rgba(11,77,162,0.06);transition:transform var(--transition),box-shadow var(--transition);
+}
+.card:hover{transform:translateY(-8px);box-shadow:0 22px 46px rgba(11,77,162,0.12)}
+.card .title{font-weight:800;color:var(--azul-francia);font-size:15px}
+.card .address{font-size:13px;color:var(--gris-500)}
+
+/* estado superior */
+.status-pill{position:absolute;right:14px;top:14px;padding:6px 10px;border-radius:999px;font-weight:800;color:#fff;font-size:12px}
+.status-incomplete{background:var(--error)}
+.status-complete{background:var(--exito)}
+
+/* checklist dentro de la tarjeta (cuadrados grandes) */
+.checklist{display:grid;grid-template-columns:repeat(1,1fr);gap:8px;margin-top:6px}
+.doc{background:#fff;border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;border:2px dashed rgba(11,77,162,0.06);transition:all 180ms ease;cursor:pointer}
+.doc .dot{width:16px;height:16px;border-radius:4px;background:#f1f5f9;box-shadow:0 6px 16px rgba(11,77,162,0.04)}
+.doc .label{font-weight:700}
+.doc small{display:block;color:#6b7280;font-weight:600}
+.doc.complete{border-style:solid;border-color:rgba(40,167,69,0.12);background:linear-gradient(180deg,#f7fff7,#ffffff)}
+.doc.complete .dot{background:var(--exito);box-shadow:0 6px 18px rgba(40,167,69,0.08)}
+
+.doc.incomplete{border-style:solid;border-color:rgba(217,83,79,0.08);background:linear-gradient(180deg,#fff8f7,#ffffff)}
+.doc.incomplete .dot{background:var(--error)}
+
+.doc .actions{margin-left:auto;display:flex;gap:8px}
+.btn{background:var(--azul-francia);color:var(--blanco);padding:8px 12px;border-radius:10px;border:0;font-weight:800;cursor:pointer;transition:transform var(--transition)}
+.btn.ghost{background:transparent;border:1px solid rgba(11,77,162,0.08);color:var(--azul-francia)}
+.btn:active{transform:scale(.98)}
+
+/* sidebar derecho (ficha rápida) */
+.sidebar{width:360px;background:var(--blanco);border-radius:14px;padding:16px;box-shadow:0 18px 40px rgba(11,77,162,0.08);position:sticky;top:86px;height:fit-content}
+.sidebar h3{margin:0 0 8px 0}
+.meta{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.meta .row{display:flex;justify-content:space-between;font-weight:700}
+.uploader{display:flex;flex-direction:column;gap:8px}
+.upload-label{display:inline-block;padding:10px;border-radius:10px;border:1px dashed rgba(11,77,162,0.12);cursor:pointer}
+
+/* footer */
+footer{padding:18px;text-align:center;color:#6b7280}
+
+/* ----------------- RESPONSIVE ----------------- */
+@media (max-width:1100px){
+  .sidenav{display:none}
+  .app-wrap{padding:12px}
+  .sidebar{position:static;width:100%;order:3}
+}
+
+@media (max-width:860px){
+  .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{min-height:160px}
+}
+
+@media (max-width:520px){
+  header{padding:12px}
+  .app-wrap{flex-direction:column;padding:10px}
+  .grid{grid-template-columns:1fr;gap:12px}
+  .card{padding:12px;border-radius:12px}
+  .checklist{grid-template-columns:repeat(2,1fr)}
+  .status-pill{right:10px;top:10px;padding:6px 8px}
+  .sidebar{width:100%;padding:12px}
+  .search input{min-width:80px}
+}
+
+/* microinteracciones */
+@keyframes floaty {0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+.card.float{animation:floaty 6s ease-in-out infinite}
+
+.fade-in{animation:fadeIn .6s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* accesibilidad focus */
+.btn:focus,.upload-label:focus,.nav-item:focus{outline:3px solid rgba(11,77,162,0.12);outline-offset:3px}
+
+/* export button small */
+#exportBtn{padding:8px 10px;border-radius:10px}
+
+/* small helpers */
+.hidden{display:none}
