@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Regularización - Lanús (Mockup)</title>
+  <meta name="description" content="Demo frontend para gestión de documentación de domicilios - Municipio de Lanús">
+  <style>
+    :root{
+      --azul-francia: #0B4DA2; /* tono propuesto */
+      --blanco: #ffffff;
+      --gris-oscuro: #2b2b2b;
+      --radio: 14px;
+      --card-size: clamp(150px, 22vw, 260px);
+      --gap: 18px;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--blanco),#f5f8ff);color:var(--gris-oscuro);}
+    header{background:var(--azul-francia);color:var(--blanco);padding:18px 24px;display:flex;align-items:center;gap:16px}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo .emblem{width:44px;height:44px;background:var(--blanco);border-radius:8px;box-shadow:0 6px 18px rgba(11,77,162,0.18);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--azul-francia)}
+    header h1{font-size:18px;margin:0}
+    .controls{margin-left:auto;display:flex;gap:12px;align-items:center}
+    .search{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.08);padding:8px 12px;border-radius:10px;color:#fff;display:flex;align-items:center;gap:8px}
+    .search input{background:transparent;border:0;outline:0;color:#fff;min-width:160px}
+
+    main{padding:22px}
+    .top-actions{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    .chip{background:var(--blanco);padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(11,77,162,0.08);font-weight:600}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card-size),1fr));gap:var(--gap)}
+
+    /* tarjeta grande cuadrada */
+    .card{background:linear-gradient(180deg, #ffffff, #f8fbff);border-radius:var(--radio);padding:16px;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;min-height:var(--card-size);box-shadow:0 8px 24px rgba(11,77,162,0.06);transition:transform .22s cubic-bezier(.2,.9,.2,1),box-shadow .22s;position:relative;overflow:hidden}
+    .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(11,77,162,0.12)}
+    .card .title{font-weight:700;margin-bottom:8px}
+    .card .address{font-size:13px;color:#556}
+    .status-pill{position:absolute;right:14px;top:14px;padding:6px 10px;border-radius:999px;font-weight:700;color:#fff;font-size:13px}
+    .status-incomplete{background:#d9534f} /* red */
+    .status-complete{background:#28a745} /* green */
+
+    .checklist{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+    .doc{background:#ffffff;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center;border:2px dashed rgba(11,77,162,0.06);transition:all .18s}
+    .doc.complete{border-style:solid;border-color:rgba(40,167,69,0.18);background:linear-gradient(180deg,#f7fff7,#ffffff)}
+    .doc .dot{width:14px;height:14px;border-radius:4px;background:#eee;border:2px solid #fff;box-shadow:0 2px 6px rgba(11,77,162,0.06)}
+    .doc.complete .dot{background:#28a745;border-color:rgba(40,167,69,0.28)}
+    .doc .label{flex:1;font-weight:600}
+    .doc small{display:block;color:#6b7280;font-weight:500}
+    .doc .actions{display:flex;gap:8px}
+
+    .btn{background:var(--azul-francia);color:var(--blanco);padding:8px 12px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(11,77,162,0.12);color:var(--azul-francia)}
+
+    /* upload area */
+    .uploader{display:flex;flex-direction:column;gap:8px}
+    .uploader input[type=file]{display:none}
+    .upload-label{display:inline-block;padding:8px 10px;border-radius:8px;border:1px dashed rgba(11,77,162,0.12);cursor:pointer}
+
+    /* panel lateral */
+    .sidebar{position:fixed;right:18px;top:86px;width:360px;background:var(--blanco);border-radius:14px;padding:18px;box-shadow:0 18px 40px rgba(11,77,162,0.08);max-height:75vh;overflow:auto}
+    .sidebar h3{margin-top:0}
+    .meta{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .meta .row{display:flex;justify-content:space-between;font-weight:600}
+
+    /* responsive */
+    @media (max-width:980px){
+      .sidebar{position:static;width:auto;margin-top:14px}
+    }
+
+    /* microinteractions */
+    .pulse{animation:pulse .9s linear infinite}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+    footer{padding:18px;text-align:center;color:#6b7280}
+
+    /* accessible focus */
+    .btn:focus,.upload-label:focus{outline:3px solid rgba(11,77,162,0.12)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="emblem">L</div>
+      <div>
+        <div style="font-size:12px;opacity:.95">Municipio de Lanús</div>
+        <h1>Regularización Dominial — Demo</h1>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="search" role="search" aria-label="Buscar domicilios">
+        🔎 <input id="buscar" placeholder="Buscar por DNI, nombre o dirección" />
+      </div>
+      <button class="btn ghost" id="exportBtn">Exportar CSV</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="top-actions">
+      <div class="chip">300 domicilios estimados</div>
+      <div class="chip">Checklist visual - tarjetas grandes</div>
+    </div>
+
+    <section aria-label="Listado de domicilios">
+      <div class="grid" id="grid">
+        <!-- tarjetas generadas por JS -->
+      </div>
+    </section>
+
+    <aside class="sidebar" id="sidebar" aria-live="polite">
+      <h3>Ficha rápida</h3>
+      <div class="meta" id="meta">
+        <div class="row"><span>Dirección</span><span id="meta-dir">-</span></div>
+        <div class="row"><span>Titular</span><span id="meta-nom">-</span></div>
+        <div class="row"><span>DNI</span><span id="meta-dni">-</span></div>
+        <div class="row"><span>Estado</span><span id="meta-est">-</span></div>
+      </div>
+      <div id="uploaderArea">
+        <strong>Subir documento (simulado)</strong>
+        <div class="uploader">
+          <label for="fileInput" class="upload-label" tabindex="0">Seleccionar archivo (JPG / PDF)</label>
+          <input id="fileInput" type="file" accept="image/*,.pdf" />
+          <small>Una vez subido, marca la documentación como completa en esa tarjeta.</small>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn" id="markComplete">Forzar Completo</button>
+        <button class="btn ghost" id="closeSide">Cerrar</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Demo frontend — diseño institucional Lanús • Colores propuestos: blanco y azul Francia.
+  </footer>
+
+  <script>
+    /* ---------- Datos de ejemplo (simulación) ---------- */
+    const domicilios = [
+      {id:1,dir:'Av. H. Yrigoyen 1234',tit:'María López',dni:'12345678',complete:false,docs:{}},
+      {id:2,dir:'Cnel. Díaz 56',tit:'Carlos Gómez',dni:'23456789',complete:false,docs:{}},
+      {id:3,dir:'Belgrano 201',tit:'Sofía Pérez',dni:'98765432',complete:true,docs:{dni:true,cuil:true,partidas:true,facturas:true,posesion:true,plano:true,arba:true,testigos:true}},
+      {id:4,dir:'Mitre 450',tit:'Juan Martín',dni:'11223344',complete:false,docs:{}},
+      {id:5,dir:'Remedios de Escalada 780',tit:'Laura Ruiz',dni:'55667788',complete:false,docs:{}},
+      {id:6,dir:'Ituzaingó 101',tit:'Diego Cavallero',dni:'30111222',complete:false,docs:{}}
+    ];
+
+    const checklistFields = [
+      {key:'dni',label:'DNI y constancia de CUIL'},
+      {key:'convivientes',label:'DNI integrantes convivientes'},
+      {key:'parentesco',label:'Partidas / Certificados de parentesco'},
+      {key:'facturas',label:'Facturas servicios (20 años verific.)'},
+      {key:'posesion',label:'Documentos de posesión (boleto, boletas, telegramas)'},
+      {key:'plano',label:'Plano ARBA / plancheta catastral'},
+      {key:'arba',label:'Boleta ARBA y TSG año en curso'},
+      {key:'testigos',label:'2 testigos (archivo)'},
+      {key:'pj',label:'Personas jurídicas (estatuto, actas)'}
+    ];
+
+    /* ---------- Render grid ---------- */
+    const grid = document.getElementById('grid');
+    function render(){
+      grid.innerHTML='';
+      domicilios.forEach(dom=>{
+        const card = document.createElement('article');
+        card.className='card';
+        card.dataset.id=dom.id;
+
+        const statusClass = dom.complete ? 'status-complete' : 'status-incomplete';
+        const statusText = dom.complete ? 'COMPLETO' : 'INCOMPLETO';
+
+        card.innerHTML = `
+          <div>
+            <div class="title">${dom.tit}</div>
+            <div class="address">${dom.dir}</div>
+          </div>
+          <div class="status-pill ${statusClass}" aria-hidden="true">${statusText}</div>
+          <div class="checklist" role="list">
+            ${checklistFields.map(f=>{
+              const is = !!dom.docs[f.key];
+              return `<div class="doc ${is? 'complete':''}" role="listitem" data-key="${f.key}">
+                <div class="dot" aria-hidden></div>
+                <div class="label">${f.label}<small>${is? 'archivo subido':'archivo ausente'}</small></div>
+                <div class="actions">
+                  <button class="btn ghost btn-open">Ver / Subir</button>
+                </div>
+              </div>`
+            }).join('')}
+          </div>
+        `;
+
+        card.querySelectorAll('.btn-open').forEach(b=>b.addEventListener('click',()=>openSidebar(dom.id)));
+        card.addEventListener('click',()=>selectCard(dom.id));
+        grid.appendChild(card);
+      });
+    }
+
+    render();
+
+    /* ---------- sidebar actions ---------- */
+    let selectedId = null;
+    const sidebar = document.getElementById('sidebar');
+    const metaDir = document.getElementById('meta-dir');
+    const metaNom = document.getElementById('meta-nom');
+    const metaDni = document.getElementById('meta-dni');
+    const metaEst = document.getElementById('meta-est');
+
+    function selectCard(id){
+      selectedId = id;
+      const dom = domicilios.find(d=>d.id===id);
+      metaDir.textContent = dom.dir;
+      metaNom.textContent = dom.tit;
+      metaDni.textContent = dom.dni;
+      metaEst.textContent = dom.complete ? 'COMPLETO' : 'INCOMPLETO';
+      sidebar.scrollTop = 0;
+      sidebar.style.boxShadow = '0 22px 60px rgba(11,77,162,0.12)';
+    }
+
+    function openSidebar(id){
+      selectCard(id);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    document.getElementById('closeSide').addEventListener('click',()=>{
+      selectedId=null;metaDir.textContent='-';metaNom.textContent='-';metaDni.textContent='-';metaEst.textContent='-';sidebar.style.boxShadow='0 18px 40px rgba(11,77,162,0.08)';
+    });
+
+    /* ---------- file input handling (simulado) ---------- */
+    const fileInput = document.getElementById('fileInput');
+    document.querySelector('.upload-label').addEventListener('keydown',e=>{if(e.key==='Enter')fileInput.click()});
+    document.querySelector('.upload-label').addEventListener('click',()=>fileInput.click());
+
+    fileInput.addEventListener('change',()=>{
+      if(!selectedId){alert('Seleccioná primero un domicilio (click en una tarjeta)');fileInput.value='';return}
+      const f = fileInput.files[0];
+      if(!f) return;
+      // simulamos: marcamos el primer campo ausente como subido
+      const dom = domicilios.find(d=>d.id===selectedId);
+      const missing = checklistFields.find(k=>!dom.docs[k.key]);
+      if(missing){
+        dom.docs[missing.key]=true;
+        // si ya se completaron todos => marcar complete
+        const all = checklistFields.every(k=>!!dom.docs[k.key] || k.key==='pj' ); // pj optional
+        dom.complete = all;
+        render();
+        selectCard(selectedId);
+        fileInput.value='';
+      }
+    });
+
+    document.getElementById('markComplete').addEventListener('click',()=>{
+      if(!selectedId){alert('Seleccioná un domicilio');return}
+      const dom = domicilios.find(d=>d.id===selectedId);
+      checklistFields.forEach(k=>dom.docs[k.key]=true);
+      dom.complete=true;render();selectCard(selectedId);
+    });
+
+    /* ---------- search ---------- */
+    document.getElementById('buscar').addEventListener('input',e=>{
+      const q = e.target.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(c=>{
+        const id = c.dataset.id;const dom = domicilios.find(d=>d.id==id);
+        const match = dom.dni.includes(q)||dom.tit.toLowerCase().includes(q)||dom.dir.toLowerCase().includes(q);
+        c.style.display = match || q.length===0 ? '' : 'none';
+      });
+    });
+
+    /* ---------- export CSV (simple) ---------- */
+    document.getElementById('exportBtn').addEventListener('click',()=>{
+      const rows = [['id','direccion','titular','dni','completo']];
+      domicilios.forEach(d=>rows.push([d.id,`"${d.dir}"`,`"${d.tit}"`,d.dni,d.complete]));
+      const csv = rows.map(r=>r.join(',')).join('\n');
+      const blob = new Blob([csv],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');a.href=url;a.download='domicilios_export.csv';a.click();URL.revokeObjectURL(url);
+    });
+
+    /* ---------- initial select first card ---------- */
+    selectCard(domicilios[0].id);
+
+  </script>
+
+  <!--
+    -----------------------------------------------------------
+    NOTAS ADICIONALES (INCLUIDAS EN EL MISMO ARCHIVO PARA PRESENTAR):
+
+    1) DIAGRAMA SIMPLIFICADO DE BASE DE DATOS (MySQL)
+
+    TABLA: domicilios
+      - id INT PK
+      - calle VARCHAR(150)
+      - numero VARCHAR(20)
+      - piso VARCHAR(10)
+      - depto VARCHAR(10)
+      - manzana VARCHAR(30)
+      - lote VARCHAR(30)
+      - barrio VARCHAR(80)
+      - codigo_postal VARCHAR(20)
+      - partido VARCHAR(80)
+      - lat FLOAT NULL
+      - lng FLOAT NULL
+      - creado_en DATETIME
+
+    TABLA: beneficiarios
+      - id INT PK
+      - domicilio_id INT FK -> domicilios.id
+      - nombre VARCHAR(200)
+      - dni VARCHAR(20)
+      - cuil VARCHAR(30)
+      - telefono VARCHAR(50)
+      - email VARCHAR(120)
+
+    TABLA: documentos
+      - id INT PK
+      - domicilio_id INT FK
+      - tipo ENUM('dni','convivientes','parentesco','facturas','posesion','plano','arba','testigos','pj')
+      - filename VARCHAR(255)
+      - mime VARCHAR(50)
+      - uploaded_by VARCHAR(80)
+      - uploaded_at DATETIME
+      - version INT DEFAULT 1
+
+    TABLA: estado_expediente
+      - id INT PK
+      - domicilio_id INT FK
+      - estado ENUM('incompleto','completo')
+      - actualizado_en DATETIME
+
+    -----------------------------------------------------------
+    2) WIREFRAMES / FLUJO BÁSICO
+      - Pantalla principal: Cabecera con busqueda + botones export
+        Grid de tarjetas grandes (una por domicilio). Cada tarjeta muestra:
+          Título (titular) - dirección - checklist visual (cada item = cuadro grande)
+          Pill de estado arriba a la derecha (verde/rojo)
+        Al hacer click en la tarjeta se abre panel lateral con ficha y uploader.
+
+      - Panel lateral: datos rápidos + uploader (file input) + boton forzar completo.
+
+    3) PRIORIDADES (MVP)
+      1) Listado de domicilios y checklist visual (front-end) -- implementado en este demo.
+      2) Subir archivos y guardar (requiere backend y storage: Drive o S3).
+      3) Marcar completo (lógica de verificación) y export.
+
+    4) SOBRE COLORES Y TIPOGRAFÍA
+      - Uso de azul Francia propuesto: --azul-francia: #0B4DA2
+      - Tipografías: Inter o sistema. Se puede agregar Google Fonts para presentación final.
+
+    -----------------------------------------------------------
+  -->
+</body>
+</html>
